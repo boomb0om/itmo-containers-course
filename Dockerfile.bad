@@ -1,0 +1,21 @@
+FROM python:latest
+
+WORKDIR /app
+
+VOLUME /app/some_data
+
+ARG PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random
+
+RUN apt-get update 
+RUN apt-get install -y gcc
+RUN python -m pip install --upgrade pip
+
+COPY . ./
+
+ENV PYTHONPATH="${PYTHONPATH}:/code/"
+
+RUN pip install -r requirements.txt
+
+CMD ["uvicorn", "demo_service.api:app", "--port", "8080", "--host", "0.0.0.0"]
