@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lab2_demo_service
+    image: lab2_demo_service
+    env_file: ".env"
+    healthcheck:
+      test: ["CMD", "curl", "http://0.0.0.0:8080/docs"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db_migration
+      - db
+    networks:
+      - service-network
+    command: ["uvicorn", "demo_service.api:app", "--port", "8080", "--host", "0.0.0.0"]
+
+  db_migration:
+    build:
+      context: ./migrations
+      dockerfile: Dockerfile
+    container_name: lab2_db_migrate
+    image: lab2_db_migrate
+    env_file: ".env"
+    depends_on:
+      - db
+    networks:
+      - service-network
+
+  db:
+    image: postgres:13.3
+    container_name: lab2_db
+    env_file: ".env"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - service-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  db_data:
+
+networks:
+  service-network:
