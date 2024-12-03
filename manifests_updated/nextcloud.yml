@@ -36,12 +36,12 @@ spec:
         - configMapRef:
             name: nextcloud-configmap
         imagePullPolicy: IfNotPresent
-        # readinessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: 80
-        #   initialDelaySeconds: 10
-        #   periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 20
         livenessProbe:
           httpGet:
             path: /

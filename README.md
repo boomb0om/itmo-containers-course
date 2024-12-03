@@ -48,13 +48,17 @@
 
 #### Создание объекта для деплоймента с перенаправлением портов
 
+![expose ports](assets/06_expose_ports.png)
 
 #### Осуществление туннелирования трафика
 
+![tunnelling](assets/07_tunnelling.png)
+![nextcloud](assets/08_nextcloud.png)
 
 #### Создание дашборда
 
-
+![dashboard creating](assets/09_dashboard_creating.png)
+![dashboard](assets/10_dashboard.png)
 
 ### Ответы на дополнительные вопросы
 
