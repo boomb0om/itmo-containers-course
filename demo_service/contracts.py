@@ -16,3 +16,7 @@ class UserRequest(BaseModel):
     first_name: str
     last_name: str
     birthdate: datetime | None = None
+
+
+class UserList(BaseModel):
+    users: list[UserResource]

@@ -2,3 +2,5 @@ fastapi
 uvicorn
 prometheus-fastapi-instrumentator
 psycopg2-binary
+aiopg
+sqlalchemy
