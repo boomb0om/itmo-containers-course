@@ -1,0 +1,63 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: backend        # название сервиса
+  labels:
+    app: backend       # название приложения
+    tier: backend      # тип приложения
+    environment: prod  # среда развертывания
+spec:
+  replicas: 1          # кол-во реплик
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend    # лейбл, который будет применен к созданным подам
+        tier: backend
+        environment: prod
+    spec:
+      initContainers:                      # создаем init-container для миграции базы
+      - name: postgres-init                # название контейнера
+        image: lab4-db-migrate             # название docker образа
+        imagePullPolicy: Never             # указываем, что не надо пулить из реестра, а использовать локальный образ
+        envFrom:                           # указываем откуда брать env переменные
+        - secretRef:
+            name: postgres-secret          # указываем Secret с именем postgres-secret
+        command: ["python3", "migrate.py"] # указываем команду, которая будет запущена после старта контейнера
+      containers:                  # указываем сами контейнеры
+      - name: lab4-backend         # имя контейнера
+        image: lab4-demo-service   # имя собранного докер образа
+        resources:                 # задаем ограничения по ресурсам
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 250m
+            memory: 128Mi
+        ports:                     # указываем порты
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        envFrom:                   # указываем откуда брать переменные окружения: из конфигмапы и сикрета
+        - configMapRef:
+            name: backend-configmap
+        - secretRef:
+            name: postgres-secret
+        imagePullPolicy: Never     # обозначаем, что пуллить образ не надо
+        readinessProbe:            # проба на чтение
+          httpGet:
+            path: /users/list
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 30
+        livenessProbe:             # health проба
+          httpGet:
+            path: /health          # дергаем health ручку приложения
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      

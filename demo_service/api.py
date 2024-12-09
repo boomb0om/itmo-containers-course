@@ -35,3 +35,11 @@ async def list_users(
     users = await get_users(conn)
     return UserList(users=users)
 
+
+@app.get(
+    "/health",
+    status_code=HTTPStatus.OK,
+)
+async def health() -> int:
+    return 1
+

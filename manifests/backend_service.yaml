@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service  # название сервиса
+  labels:
+    app: backend         # название приложения
+    tier: backend        # тип приложения
+    environment: prod    # окружение (среда развертывания)
+spec:
+  type: ClusterIP        # тип сервиса (ClusterIP - дефолтный)
+  ports:
+    - port: 8080         # какой порт экспоузим
+  selector:
+    app: backend         # селектор для подов, к которым относится этот сервис

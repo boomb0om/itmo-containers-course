@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap  # название конфигмапы
+  labels:
+    app: backend           # название приложения
+    environment: prod      # окружение
+data:
+  TEST_ENV: "test"

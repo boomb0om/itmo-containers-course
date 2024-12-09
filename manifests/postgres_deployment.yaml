@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+    tier: database
+    environment: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+        environment: prod
+    spec:
+      containers:
+        - name: postgres-container
+          image: postgres:13.3
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-configmap
+            - secretRef:
+                name: postgres-secret
+          volumeMounts:
+            - name: pg-data                        # название volume
+              mountPath: /var/lib/postgresql/data  # путь внутри контейнера куда будет смонтирован volume
+          livenessProbe:                           # liveness проба для БД
+            exec:
+             command: ["pg_isready"]
+            initialDelaySeconds: 10                # задержка перед самой первой проверкой
+            periodSeconds: 10                      # интервал между проверками
+
+      volumes:
+        - name: pg-data            # имя тома
+          persistentVolumeClaim:   # указываем ref на PVC
+            claimName: pg-pvc      # название PVC
+          
